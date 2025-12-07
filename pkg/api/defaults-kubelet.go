@@ -28,8 +28,6 @@ func (cs *ContainerService) setKubeletConfig(isUpgrade bool) {
 		"--tls-private-key-file":              "/etc/kubernetes/certs/kubeletserver.key",
 		"--v":                                 "2",
 		"--volume-plugin-dir":                 "/etc/kubernetes/volumeplugins",
-		"--image-credential-provider-config":  "/var/lib/kubelet/credential-provider-config.yaml",
-		"--image-credential-provider-bin-dir": "/var/lib/kubelet/credential-provider",
 	}
 
 	for key := range staticLinuxKubeletConfig {
@@ -149,6 +147,11 @@ func (cs *ContainerService) setKubeletConfig(isUpgrade bool) {
 
 	addDefaultFeatureGates(o.KubernetesConfig.KubeletConfig, o.OrchestratorVersion, minVersionRotateCerts, "RotateKubeletServerCertificate=true")
 	addDefaultFeatureGates(o.KubernetesConfig.KubeletConfig, o.OrchestratorVersion, "1.20.0-rc.0", "ExecProbeTimeout=true")
+	// SeccompDefault graduated to GA in 1.29, needs explicit enablement before that
+	// This is required when using --seccomp-default=true flag
+	if !common.IsKubernetesVersionGe(o.OrchestratorVersion, "1.29.0") {
+		addDefaultFeatureGates(o.KubernetesConfig.KubeletConfig, o.OrchestratorVersion, "1.22.0", "SeccompDefault=true")
+	}
 	// STIG Rule ID: SV-254801r879719_rule
 	addDefaultFeatureGates(o.KubernetesConfig.KubeletConfig, o.OrchestratorVersion, "1.25.0", "PodSecurity=true")
 
