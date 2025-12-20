@@ -19224,6 +19224,14 @@ write_files:
 {{end}}
 
 {{- if .OrchestratorProfile.KubernetesConfig.RequiresDocker}}
+- path: /etc/systemd/system/docker.service.d/clear_mount_propagation_flags.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    MountFlags=shared
+    #EOF
+
 - path: /etc/systemd/system/docker.service.d/exec_start.conf
   permissions: "0644"
   owner: root
@@ -19769,6 +19777,14 @@ write_files:
 {{end}}
 
 {{- if .KubernetesConfig.RequiresDocker}}
+- path: /etc/systemd/system/docker.service.d/clear_mount_propagation_flags.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    MountFlags=shared
+    #EOF
+
 - path: /etc/systemd/system/docker.service.d/exec_start.conf
   permissions: "0644"
   owner: root
